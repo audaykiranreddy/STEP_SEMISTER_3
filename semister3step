@@ -1,196 +1,237 @@
-import java.util.*;
+import java.util.Arrays;
 
-public class Week4Assignment {
+public class FantasyTeamAssignment {
 
     // =====================================================
-    // A1. PRODUCT OF ARRAY EXCEPT SELF
+    // PROBLEM 1
+    // FANTASY TEAM SCORE MULTIPLIER
     // =====================================================
 
-    static int[] productExceptSelf(int[] nums) {
+    static void applyMultipliers(
+            double[] playerScores,
+            int captainIndex,
+            int viceCaptainIndex) {
 
-        int n = nums.length;
-        int[] answer = new int[n];
+        // Captain gets 2x points
+        playerScores[captainIndex] =
+                playerScores[captainIndex] * 2;
 
-        // Forward pass
-        int leftProduct = 1;
-
-        for (int i = 0; i < n; i++) {
-
-            answer[i] = leftProduct;
-
-            leftProduct = leftProduct * nums[i];
-        }
-
-        // Backward pass
-        int rightProduct = 1;
-
-        for (int i = n - 1; i >= 0; i--) {
-
-            answer[i] = answer[i] * rightProduct;
-
-            rightProduct = rightProduct * nums[i];
-        }
-
-        return answer;
+        // Vice-Captain gets 1.5x points
+        playerScores[viceCaptainIndex] =
+                playerScores[viceCaptainIndex] * 1.5;
     }
 
 
     // =====================================================
-    // A2. MAXIMUM SUBARRAY - KADANE'S ALGORITHM
+    // PROBLEM 2
+    // DUPLICATE PLAYER PICK CHECKER
     // =====================================================
 
-    static int maxSubArray(int[] nums) {
+    static String findDuplicatePick(String[] playerNames) {
 
-        int currentSum = nums[0];
-        int maxSum = nums[0];
+        for (int i = 0; i < playerNames.length; i++) {
 
-        for (int i = 1; i < nums.length; i++) {
+            for (int j = i + 1; j < playerNames.length; j++) {
 
-            currentSum = Math.max(
-                nums[i],
-                currentSum + nums[i]
-            );
+                if (playerNames[i].equals(playerNames[j])) {
 
-            maxSum = Math.max(
-                maxSum,
-                currentSum
-            );
-        }
-
-        return maxSum;
-    }
-
-
-    // =====================================================
-    // A3. 3SUM
-    // =====================================================
-
-    static int[][] threeSum(int[] nums) {
-
-        Arrays.sort(nums);
-
-        ArrayList<int[]> result = new ArrayList<>();
-
-        for (int i = 0; i < nums.length - 2; i++) {
-
-            // Skip duplicate first values
-            if (i > 0 && nums[i] == nums[i - 1]) {
-                continue;
-            }
-
-            int left = i + 1;
-            int right = nums.length - 1;
-
-            while (left < right) {
-
-                int sum =
-                    nums[i] + nums[left] + nums[right];
-
-                if (sum == 0) {
-
-                    result.add(new int[] {
-                        nums[i],
-                        nums[left],
-                        nums[right]
-                    });
-
-                    // Skip duplicate left values
-                    while (left < right &&
-                           nums[left] == nums[left + 1]) {
-                        left++;
-                    }
-
-                    // Skip duplicate right values
-                    while (left < right &&
-                           nums[right] == nums[right - 1]) {
-                        right--;
-                    }
-
-                    left++;
-                    right--;
-
-                } else if (sum < 0) {
-
-                    left++;
-
-                } else {
-
-                    right--;
+                    return "Duplicate Found: " + playerNames[i];
                 }
             }
         }
 
-        int[][] answer = new int[result.size()][];
-
-        for (int i = 0; i < result.size(); i++) {
-            answer[i] = result.get(i);
-        }
-
-        return answer;
+        return "No Duplicates Found";
     }
 
 
     // =====================================================
-    // A4. SUBARRAY SUM EQUALS K
+    // PROBLEM 3
+    // TOP PERFORMER TRACKER
     // =====================================================
 
-    static int subarraySum(int[] nums, int k) {
+    static String findMinMaxSpread(int[] scores) {
 
-        HashMap<Integer, Integer> map = new HashMap<>();
+        int min = scores[0];
+        int max = scores[0];
 
-        // Empty prefix sum
-        map.put(0, 1);
+        for (int i = 1; i < scores.length; i++) {
 
-        int currentSum = 0;
-        int count = 0;
-
-        for (int num : nums) {
-
-            currentSum = currentSum + num;
-
-            int requiredSum = currentSum - k;
-
-            if (map.containsKey(requiredSum)) {
-
-                count = count + map.get(requiredSum);
+            if (scores[i] < min) {
+                min = scores[i];
             }
 
-            map.put(
-                currentSum,
-                map.getOrDefault(currentSum, 0) + 1
-            );
+            if (scores[i] > max) {
+                max = scores[i];
+            }
         }
 
-        return count;
+        int spread = max - min;
+
+        return "Min: " + min
+                + " | Max: " + max
+                + " | Spread: " + spread;
     }
 
 
     // =====================================================
-    // A5. FIND MINIMUM IN ROTATED SORTED ARRAY
+    // PROBLEM 4
+    // MATCH DAY GRID ANALYZER
     // =====================================================
 
-    static int findMin(int[] nums) {
+    static double rowAverage(int[] row) {
 
-        int left = 0;
-        int right = nums.length - 1;
+        int sum = 0;
 
-        while (left < right) {
+        for (int value : row) {
+            sum = sum + value;
+        }
 
-            int mid = left + (right - left) / 2;
+        return (double) sum / row.length;
+    }
 
-            if (nums[mid] > nums[right]) {
 
-                // Minimum is in the right half
-                left = mid + 1;
+    static String classifyMatches(
+            int[][] runsPerOver,
+            int threshold) {
+
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < runsPerOver.length; i++) {
+
+            double average = rowAverage(runsPerOver[i]);
+
+            if (average >= threshold) {
+
+                result.append(
+                    "Match " + i + ": Power Surge"
+                );
 
             } else {
 
-                // Minimum is in the left half
-                right = mid;
+                result.append(
+                    "Match " + i + ": Normal"
+                );
+            }
+
+            if (i < runsPerOver.length - 1) {
+                result.append(" | ");
             }
         }
 
-        return nums[left];
+        return result.toString();
+    }
+
+
+    // =====================================================
+    // PROBLEM 5
+    // FANTASY LEAGUE AUTO-DRAFT RANKING ENGINE
+    // =====================================================
+
+    static class Player implements Comparable<Player> {
+
+        private String name;
+        private int matchesPlayed;
+        private double battingAverage;
+        private boolean injured;
+
+
+        // Constructor
+        public Player(
+                String name,
+                int matchesPlayed,
+                double battingAverage,
+                boolean injured) {
+
+            this.name = name;
+            this.matchesPlayed = matchesPlayed;
+            this.battingAverage = battingAverage;
+            this.injured = injured;
+        }
+
+
+        // Experience-only rule
+        static boolean isDraftable(int matchesPlayed) {
+
+            return matchesPlayed >= 10;
+        }
+
+
+        // Matches + fitness rule
+        static boolean isDraftable(
+                int matchesPlayed,
+                boolean injured) {
+
+            return matchesPlayed >= 5 && !injured;
+        }
+
+
+        // Compare players by batting average
+        // in descending order
+        @Override
+        public int compareTo(Player other) {
+
+            return Double.compare(
+                other.battingAverage,
+                this.battingAverage
+            );
+        }
+
+
+        // Auto-draft and ranking
+        static String draftAndRank(Player[] players) {
+
+            // Temporary array for draftable players
+            Player[] draftable =
+                    new Player[players.length];
+
+            int count = 0;
+
+
+            // Find draftable players
+            for (Player player : players) {
+
+                if (isDraftable(player.matchesPlayed)
+                        || isDraftable(
+                            player.matchesPlayed,
+                            player.injured)) {
+
+                    draftable[count] = player;
+                    count++;
+                }
+            }
+
+
+            // Create exact-size array
+            Player[] selected =
+                    new Player[count];
+
+            for (int i = 0; i < count; i++) {
+
+                selected[i] = draftable[i];
+            }
+
+
+            // Sort using compareTo()
+            Arrays.sort(selected);
+
+
+            // Build output
+            StringBuilder result =
+                    new StringBuilder();
+
+            for (int i = 0; i < selected.length; i++) {
+
+                result.append(
+                    (i + 1) + ". " + selected[i].name
+                );
+
+                if (i < selected.length - 1) {
+                    result.append(" | ");
+                }
+            }
+
+            return result.toString();
+        }
     }
 
 
@@ -202,92 +243,141 @@ public class Week4Assignment {
 
 
         // -------------------------------------------------
-        // A1. PRODUCT OF ARRAY EXCEPT SELF
+        // PROBLEM 1
         // -------------------------------------------------
 
         System.out.println("=================================");
-        System.out.println("A1. PRODUCT OF ARRAY EXCEPT SELF");
+        System.out.println("PROBLEM 1 - SCORE MULTIPLIER");
         System.out.println("=================================");
 
-        int[] nums1 = {1, 2, 3, 4};
-
-        int[] answer1 = productExceptSelf(nums1);
-
-        System.out.println(Arrays.toString(answer1));
-
-
-        // -------------------------------------------------
-        // A2. MAXIMUM SUBARRAY
-        // -------------------------------------------------
-
-        System.out.println();
-        System.out.println("=================================");
-        System.out.println("A2. MAXIMUM SUBARRAY");
-        System.out.println("=================================");
-
-        int[] nums2 = {
-            -2, 1, -3, 4, -1, 2, 1, -5, 4
+        double[] scores = {
+            40, 55, 30, 62
         };
 
-        System.out.println(maxSubArray(nums2));
-
-
-        // -------------------------------------------------
-        // A3. 3SUM
-        // -------------------------------------------------
-
-        System.out.println();
-        System.out.println("=================================");
-        System.out.println("A3. 3SUM");
-        System.out.println("=================================");
-
-        int[] nums3 = {
-            -1, 0, 1, 2, -1, -4
-        };
-
-        int[][] answer3 = threeSum(nums3);
-
-        for (int[] triplet : answer3) {
-
-            System.out.println(
-                Arrays.toString(triplet)
-            );
-        }
-
-
-        // -------------------------------------------------
-        // A4. SUBARRAY SUM EQUALS K
-        // -------------------------------------------------
-
-        System.out.println();
-        System.out.println("=================================");
-        System.out.println("A4. SUBARRAY SUM EQUALS K");
-        System.out.println("=================================");
-
-        int[] nums4 = {1, 1, 1};
-
-        int k = 2;
+        applyMultipliers(scores, 1, 3);
 
         System.out.println(
-            subarraySum(nums4, k)
+            Arrays.toString(scores)
         );
 
 
         // -------------------------------------------------
-        // A5. FIND MINIMUM IN ROTATED SORTED ARRAY
+        // PROBLEM 2
         // -------------------------------------------------
 
         System.out.println();
         System.out.println("=================================");
-        System.out.println("A5. FIND MINIMUM");
+        System.out.println("PROBLEM 2 - DUPLICATE PLAYER");
         System.out.println("=================================");
 
-        int[] nums5 = {
-            3, 4, 5, 1, 2
+        String[] players1 = {
+            "Kohli",
+            "Bumrah",
+            "Kohli",
+            "Rohit"
         };
 
         System.out.println(
-            findMin(nums5)
+            findDuplicatePick(players1)
+        );
+
+
+        String[] players2 = {
+            "Kohli",
+            "Bumrah",
+            "Rohit"
+        };
+
+        System.out.println(
+            findDuplicatePick(players2)
+        );
+
+
+        // -------------------------------------------------
+        // PROBLEM 3
+        // -------------------------------------------------
+
+        System.out.println();
+        System.out.println("=================================");
+        System.out.println("PROBLEM 3 - TOP PERFORMER");
+        System.out.println("=================================");
+
+        int[] playerScores = {
+            45, 82, 79, 90, 33, 90, 61
+        };
+
+        System.out.println(
+            findMinMaxSpread(playerScores)
+        );
+
+
+        // -------------------------------------------------
+        // PROBLEM 4
+        // -------------------------------------------------
+
+        System.out.println();
+        System.out.println("=================================");
+        System.out.println("PROBLEM 4 - MATCH DAY GRID");
+        System.out.println("=================================");
+
+        int[][] runsPerOver = {
+            {4, 6, 8},
+            {10, 12, 14},
+            {2, 3, 1}
+        };
+
+        int threshold = 8;
+
+        System.out.println(
+            classifyMatches(
+                runsPerOver,
+                threshold
+            )
+        );
+
+
+        // -------------------------------------------------
+        // PROBLEM 5
+        // -------------------------------------------------
+
+        System.out.println();
+        System.out.println("=================================");
+        System.out.println("PROBLEM 5 - AUTO DRAFT");
+        System.out.println("=================================");
+
+        Player[] players = {
+
+            new Player(
+                "Virat",
+                15,
+                48.0,
+                false
+            ),
+
+            new Player(
+                "Rahul",
+                7,
+                55.0,
+                false
+            ),
+
+            new Player(
+                "Sameer",
+                3,
+                60.0,
+                false
+            ),
+
+            new Player(
+                "Dev",
+                12,
+                20.0,
+                true
+            )
+        };
+
+        System.out.println(
+            Player.draftAndRank(players)
         );
     }
 }
