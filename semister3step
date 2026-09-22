@@ -1,62 +1,196 @@
-public class Week3Assignment {
+import java.util.*;
+
+public class Week4Assignment {
 
     // =====================================================
-    // L1. SIMPLE BOOK RECORD CLASS
+    // A1. PRODUCT OF ARRAY EXCEPT SELF
     // =====================================================
 
-    static class Book {
-        String title;
-        double price;
-    }
+    static int[] productExceptSelf(int[] nums) {
 
+        int n = nums.length;
+        int[] answer = new int[n];
 
-    // =====================================================
-    // L2. TWO OBJECTS, TWO SEPARATE OCCUPANCY COUNTS
-    // =====================================================
+        // Forward pass
+        int leftProduct = 1;
 
-    static class ExamHall {
-        String hallName;
-        int seatsFilled;
-    }
+        for (int i = 0; i < n; i++) {
 
+            answer[i] = leftProduct;
 
-    // =====================================================
-    // L3. READING JAVA'S DEFAULT FIELD VALUES
-    // =====================================================
-
-    static class Employee {
-        String empName;
-        double salary;
-        boolean permanent;
-    }
-
-
-    // =====================================================
-    // L4. BASIC CONSTRUCTOR FOR A PRODUCT
-    // =====================================================
-
-    static class Product {
-        String productId;
-        String productName;
-
-        Product(String productId, String productName) {
-            this.productId = productId;
-            this.productName = productName;
+            leftProduct = leftProduct * nums[i];
         }
+
+        // Backward pass
+        int rightProduct = 1;
+
+        for (int i = n - 1; i >= 0; i--) {
+
+            answer[i] = answer[i] * rightProduct;
+
+            rightProduct = rightProduct * nums[i];
+        }
+
+        return answer;
     }
 
 
     // =====================================================
-    // L5. COUNTING OBJECTS WITH A STATIC FIELD
+    // A2. MAXIMUM SUBARRAY - KADANE'S ALGORITHM
     // =====================================================
 
-    static class Order {
+    static int maxSubArray(int[] nums) {
 
-        static int totalOrders = 0;
+        int currentSum = nums[0];
+        int maxSum = nums[0];
 
-        Order() {
-            totalOrders++;
+        for (int i = 1; i < nums.length; i++) {
+
+            currentSum = Math.max(
+                nums[i],
+                currentSum + nums[i]
+            );
+
+            maxSum = Math.max(
+                maxSum,
+                currentSum
+            );
         }
+
+        return maxSum;
+    }
+
+
+    // =====================================================
+    // A3. 3SUM
+    // =====================================================
+
+    static int[][] threeSum(int[] nums) {
+
+        Arrays.sort(nums);
+
+        ArrayList<int[]> result = new ArrayList<>();
+
+        for (int i = 0; i < nums.length - 2; i++) {
+
+            // Skip duplicate first values
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            int left = i + 1;
+            int right = nums.length - 1;
+
+            while (left < right) {
+
+                int sum =
+                    nums[i] + nums[left] + nums[right];
+
+                if (sum == 0) {
+
+                    result.add(new int[] {
+                        nums[i],
+                        nums[left],
+                        nums[right]
+                    });
+
+                    // Skip duplicate left values
+                    while (left < right &&
+                           nums[left] == nums[left + 1]) {
+                        left++;
+                    }
+
+                    // Skip duplicate right values
+                    while (left < right &&
+                           nums[right] == nums[right - 1]) {
+                        right--;
+                    }
+
+                    left++;
+                    right--;
+
+                } else if (sum < 0) {
+
+                    left++;
+
+                } else {
+
+                    right--;
+                }
+            }
+        }
+
+        int[][] answer = new int[result.size()][];
+
+        for (int i = 0; i < result.size(); i++) {
+            answer[i] = result.get(i);
+        }
+
+        return answer;
+    }
+
+
+    // =====================================================
+    // A4. SUBARRAY SUM EQUALS K
+    // =====================================================
+
+    static int subarraySum(int[] nums, int k) {
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        // Empty prefix sum
+        map.put(0, 1);
+
+        int currentSum = 0;
+        int count = 0;
+
+        for (int num : nums) {
+
+            currentSum = currentSum + num;
+
+            int requiredSum = currentSum - k;
+
+            if (map.containsKey(requiredSum)) {
+
+                count = count + map.get(requiredSum);
+            }
+
+            map.put(
+                currentSum,
+                map.getOrDefault(currentSum, 0) + 1
+            );
+        }
+
+        return count;
+    }
+
+
+    // =====================================================
+    // A5. FIND MINIMUM IN ROTATED SORTED ARRAY
+    // =====================================================
+
+    static int findMin(int[] nums) {
+
+        int left = 0;
+        int right = nums.length - 1;
+
+        while (left < right) {
+
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] > nums[right]) {
+
+                // Minimum is in the right half
+                left = mid + 1;
+
+            } else {
+
+                // Minimum is in the left half
+                right = mid;
+            }
+        }
+
+        return nums[left];
     }
 
 
@@ -68,109 +202,92 @@ public class Week3Assignment {
 
 
         // -------------------------------------------------
-        // L1. SIMPLE BOOK RECORD CLASS
+        // A1. PRODUCT OF ARRAY EXCEPT SELF
         // -------------------------------------------------
 
         System.out.println("=================================");
-        System.out.println("L1. SIMPLE BOOK RECORD");
+        System.out.println("A1. PRODUCT OF ARRAY EXCEPT SELF");
         System.out.println("=================================");
 
-        Book book = new Book();
+        int[] nums1 = {1, 2, 3, 4};
 
-        book.title = "Clean Code";
-        book.price = 650.0;
+        int[] answer1 = productExceptSelf(nums1);
 
-        System.out.println(
-            "Title: " + book.title +
-            " | Price: Rs " + book.price
-        );
+        System.out.println(Arrays.toString(answer1));
 
 
         // -------------------------------------------------
-        // L2. TWO OBJECTS, TWO SEPARATE OCCUPANCY COUNTS
+        // A2. MAXIMUM SUBARRAY
         // -------------------------------------------------
 
         System.out.println();
         System.out.println("=================================");
-        System.out.println("L2. EXAM HALL");
+        System.out.println("A2. MAXIMUM SUBARRAY");
         System.out.println("=================================");
 
-        ExamHall hallA = new ExamHall();
-        ExamHall hallB = new ExamHall();
+        int[] nums2 = {
+            -2, 1, -3, 4, -1, 2, 1, -5, 4
+        };
 
-        hallA.hallName = "Block-3 Hall A";
-        hallB.hallName = "Block-3 Hall B";
-
-        hallA.seatsFilled++;
-        hallA.seatsFilled++;
-        hallA.seatsFilled++;
-        hallA.seatsFilled++;
-
-        System.out.println(
-            hallA.hallName +
-            " seatsFilled: " +
-            hallA.seatsFilled
-        );
-
-        System.out.println(
-            hallB.hallName +
-            " seatsFilled: " +
-            hallB.seatsFilled
-        );
+        System.out.println(maxSubArray(nums2));
 
 
         // -------------------------------------------------
-        // L3. READING JAVA'S DEFAULT FIELD VALUES
+        // A3. 3SUM
         // -------------------------------------------------
 
         System.out.println();
         System.out.println("=================================");
-        System.out.println("L3. DEFAULT FIELD VALUES");
+        System.out.println("A3. 3SUM");
         System.out.println("=================================");
 
-        Employee employee = new Employee();
+        int[] nums3 = {
+            -1, 0, 1, 2, -1, -4
+        };
 
-        System.out.println("Name: " + employee.empName);
-        System.out.println("Salary: " + employee.salary);
-        System.out.println("Permanent: " + employee.permanent);
+        int[][] answer3 = threeSum(nums3);
+
+        for (int[] triplet : answer3) {
+
+            System.out.println(
+                Arrays.toString(triplet)
+            );
+        }
 
 
         // -------------------------------------------------
-        // L4. BASIC CONSTRUCTOR FOR A PRODUCT
+        // A4. SUBARRAY SUM EQUALS K
         // -------------------------------------------------
 
         System.out.println();
         System.out.println("=================================");
-        System.out.println("L4. PRODUCT CONSTRUCTOR");
+        System.out.println("A4. SUBARRAY SUM EQUALS K");
         System.out.println("=================================");
 
-        Product product =
-            new Product("P-1042", "Wireless Mouse");
+        int[] nums4 = {1, 1, 1};
+
+        int k = 2;
 
         System.out.println(
-            product.productId +
-            " - " +
-            product.productName
+            subarraySum(nums4, k)
         );
 
 
         // -------------------------------------------------
-        // L5. COUNTING OBJECTS WITH A STATIC FIELD
+        // A5. FIND MINIMUM IN ROTATED SORTED ARRAY
         // -------------------------------------------------
 
         System.out.println();
         System.out.println("=================================");
-        System.out.println("L5. STATIC OBJECT COUNTER");
+        System.out.println("A5. FIND MINIMUM");
         System.out.println("=================================");
 
-        Order order1 = new Order();
-        Order order2 = new Order();
-        Order order3 = new Order();
-        Order order4 = new Order();
+        int[] nums5 = {
+            3, 4, 5, 1, 2
+        };
 
         System.out.println(
-            "Total orders: " +
-            Order.totalOrders
+            findMin(nums5)
         );
     }
 }
